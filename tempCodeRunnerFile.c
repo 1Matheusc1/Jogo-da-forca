@@ -1,2 +1,0 @@
-
-#include <locale.h>
