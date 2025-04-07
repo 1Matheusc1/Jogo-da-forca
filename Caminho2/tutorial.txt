@@ -1,0 +1,36 @@
+# O que fazer ao iniciar o expediente diariamente?
+
+a. Ativar a VPN (para ter acesso aos bancos de dados dos projetos).
+
+sudo openvpn /home/dsk-03353/Downloads/vpn/transito/kariofreire.ovpn
+
+b. Verificar com Tech Lead se tem demanda, caso esteja ocioso.
+c. Verificar o Jira se tem alguma atividade que está atribuída a mim em (disponível para desenvolver) backlog.
+
+https://fabricainfo.atlassian.net/jira/software/c/projects/TK/boards/52
+
+d. Caso meu Tech Lead não responda no mesmo instante, buscar atividade com outro membro da equipe ou procurar uma atividade em backlog (disponível para desenvolver) que consiga fazer.
+
+
+# Entendendo como acessar meu projeto pela URL
+
+Todos os projetos da Fabricainfo é estruturado em docker, então é importante estudar os comandos básicos do docker.
+Exemplo, quero saber onde está sendo executado o projeto amc trânsito: 
+
+$ cd /projects/godocs-cliente
+
+Desejo saber em qual porta o projeto está configurado:
+
+$ docker compose ps
+
+Esse comando vai retornar os containers do projeto e suas respectivas informações, como porta, nome do container e etc ...
+
+Posterior a isso, atualize a branch que você está para evitar conflitos com os coleguinhas, então execute:
+
+$ git status # Retorna o status de arquivos da raiz do seu projeto
+$ git branch # Retrona o nome da branch que seu projeto está
+$ git pull origin <nome branch> # Atualiza a branch de acordo com bitbucket
+
+# Importante
+
+Sempre que iniciar uma atividade, fazer ela em uma branch separada (nunca faça na develop ou master).

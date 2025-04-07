@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jogo da Forca</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .game-container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      h1 {
+        font-size: 2em;
+        color: #2e7d32;
+        margin-bottom: 8px;
+      }
+
+      p.subtitle {
+        font-size: 1em;
+        color: #555;
+        margin-bottom: 20px;
+      }
+
+      svg {
+        width: 100%;
+        max-width: 200px;
+        height: auto;
+        margin-bottom: 20px;
+      }
+
+      #word-display {
+        font-size: 2em;
+        letter-spacing: 12px;
+        font-weight: 600;
+        margin-bottom: 20px;
+      }
+
+      #letters {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      #letters button {
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      #letters button.correct {
+        background-color: #4caf50;
+        color: white;
+      }
+      #letters button.wrong {
+        background-color: #ccc;
+        color: #666;
+        cursor: not-allowed;
+      }
+
+      #game-info p {
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      #message {
+        margin-top: 10px;
+        font-size: 1em;
+        color: #e53935;
+      }
+
+      .win {
+        color: #2e7d32;
+      }
+      .lose {
+        color: #e53935;
+      }
+
+      #new-game {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1em;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      #new-game:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-container">
+      <h1>Jogo da Forca</h1>
+      <p class="subtitle">Adivinhe a palavra secreta!</p>
+
+      <svg id="boneco" viewBox="0 0 200 260">
+        <line
+          x1="30"
+          y1="250"
+          x2="130"
+          y2="250"
+          stroke="#2e2e2e"
+          stroke-width="12"
+          stroke-linecap="round"
+        />
+        <line
+          x1="70"
+          y1="250"
+          x2="70"
+          y2="30"
+          stroke="#2e2e2e"
+          stroke-width="12"
+          stroke-linecap="round"
+        />
+        <line
+          x1="70"
+          y1="30"
+          x2="150"
+          y2="30"
+          stroke="#2e2e2e"
+          stroke-width="12"
+          stroke-linecap="round"
+        />
+        <line
+          x1="150"
+          y1="30"
+          x2="150"
+          y2="60"
+          stroke="#2e2e2e"
+          stroke-width="4"
+        />
+
+        <circle
+          id="svg-head"
+          cx="150"
+          cy="85"
+          r="18"
+          fill="#2e2e2e"
+          style="display: none"
+        />
+        <line
+          id="svg-body"
+          x1="150"
+          y1="103"
+          x2="150"
+          y2="165"
+          stroke="#2e2e2e"
+          stroke-width="6"
+          style="display: none"
+        />
+        <line
+          id="svg-arm-left"
+          x1="150"
+          y1="120"
+          x2="125"
+          y2="140"
+          stroke="#2e2e2e"
+          stroke-width="6"
+          style="display: none"
+        />
+        <line
+          id="svg-arm-right"
+          x1="150"
+          y1="120"
+          x2="175"
+          y2="140"
+          stroke="#2e2e2e"
+          stroke-width="6"
+          style="display: none"
+        />
+        <line
+          id="svg-leg-left"
+          x1="150"
+          y1="165"
+          x2="130"
+          y2="200"
+          stroke="#2e2e2e"
+          stroke-width="6"
+          style="display: none"
+        />
+        <line
+          id="svg-leg-right"
+          x1="150"
+          y1="165"
+          x2="170"
+          y2="200"
+          stroke="#2e2e2e"
+          stroke-width="6"
+          style="display: none"
+        />
+      </svg>
+
+      <div id="word-display"></div>
+      <div id="letters"></div>
+      <div id="game-info">
+        <p id="attempts">Tentativas restantes: 6</p>
+        <p id="message"></p>
+      </div>
+      <button id="new-game" onclick="startGame()">Novo Jogo</button>
+    </div>
+
+    <script>
+      const words = [
+        "banana",
+        "maçã",
+        "abacaxi",
+        "laranja",
+        "melancia",
+        "morango",
+        "pera",
+      ];
+      let selectedWord = "";
+      let guessedLetters = [];
+      let attemptsLeft = 6;
+      let gameOver = false;
+
+      function startGame() {
+        selectedWord = words[Math.floor(Math.random() * words.length)];
+        guessedLetters = [];
+        attemptsLeft = 6;
+        gameOver = false;
+
+        document.getElementById("message").textContent = "";
+        document.getElementById("message").className = "";
+        document.getElementById(
+          "attempts"
+        ).textContent = `Tentativas restantes: ${attemptsLeft}`;
+        updateWordDisplay();
+        createLetterButtons();
+        resetForca();
+      }
+
+      function createLetterButtons() {
+        const container = document.getElementById("letters");
+        container.innerHTML = "";
+        "abcdefghijklmnopqrstuvwxyz".split("").forEach((letter) => {
+          const btn = document.createElement("button");
+          btn.textContent = letter;
+          btn.onclick = () => guessLetter(letter, btn);
+          container.appendChild(btn);
+        });
+      }
+
+      function guessLetter(letter, button) {
+        if (gameOver || guessedLetters.includes(letter)) return;
+
+        guessedLetters.push(letter);
+
+        if (selectedWord.includes(letter)) {
+          button.classList.add("correct");
+          updateWordDisplay();
+          checkWin();
+        } else {
+          button.classList.add("wrong");
+          button.disabled = true;
+          attemptsLeft--;
+          document.getElementById(
+            "attempts"
+          ).textContent = `Tentativas restantes: ${attemptsLeft}`;
+          updateForca();
+          checkGameOver();
+        }
+      }
+
+      function updateWordDisplay() {
+        const display = selectedWord
+          .split("")
+          .map((l) => (guessedLetters.includes(l) ? l : "_"))
+          .join(" ");
+        document.getElementById("word-display").textContent = display;
+      }
+
+      function updateForca() {
+        const parts = [
+          "svg-head",
+          "svg-body",
+          "svg-arm-left",
+          "svg-arm-right",
+          "svg-leg-left",
+          "svg-leg-right",
+        ];
+        const index = 6 - attemptsLeft - 1;
+        if (index >= 0) {
+          document.getElementById(parts[index]).style.display = "block";
+        }
+      }
+
+      function resetForca() {
+        [
+          "svg-head",
+          "svg-body",
+          "svg-arm-left",
+          "svg-arm-right",
+          "svg-leg-left",
+          "svg-leg-right",
+        ].forEach((part) => {
+          document.getElementById(part).style.display = "none";
+        });
+      }
+
+      function checkWin() {
+        const won = selectedWord
+          .split("")
+          .every((l) => guessedLetters.includes(l));
+        if (won) {
+          document.getElementById("message").textContent = "🎉 Você venceu!";
+          document.getElementById("message").className = "win";
+          gameOver = true;
+        }
+      }
+
+      function checkGameOver() {
+        if (attemptsLeft <= 0) {
+          document.getElementById(
+            "message"
+          ).textContent = `Você perdeu! A palavra era: ${selectedWord}`;
+          document.getElementById("message").className = "lose";
+          gameOver = true;
+        }
+      }
+
+      startGame();
+    </script>
+  </body>
+</html>
